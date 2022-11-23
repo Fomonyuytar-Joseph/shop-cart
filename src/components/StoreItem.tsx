@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Card } from "react-bootstrap";
 import { FormatCurrency } from "../utilities/FormatCurrency";
-import { useShoppingCart } from "../context/ShoppingCartContext"
+import { useShoppingCart } from "../context/ShoppingCartContext";
 
 interface StoreItemProps {
   id: number;
@@ -10,15 +10,13 @@ interface StoreItemProps {
   imgUrl: string;
 }
 const StoreItem = ({ id, name, price, imgUrl }: StoreItemProps) => {
-
-    const {
-        getItemQuantity,
-        increaseCartQuantity,
-        decreaseCartQuantity,
-        removeFromCart,
-      } = useShoppingCart()
-      const quantity = getItemQuantity(id)
-    
+  const {
+    getItemQuantity,
+    increaseCartQuantity,
+    decreaseCartQuantity,
+    removeFromCart,
+  } = useShoppingCart();
+  const quantity = getItemQuantity(id);
 
   return (
     <Card className="h-100">
@@ -35,27 +33,28 @@ const StoreItem = ({ id, name, price, imgUrl }: StoreItemProps) => {
         </Card.Title>
         <div className="mt-auto">
           {quantity === 0 ? (
-            <Button className="w-100">+ Add to Cart</Button>
+            <Button className="w-100"  onClick={() => increaseCartQuantity(id)}>
+              + Add to Cart
+            </Button>
           ) : (
             <div
-            className="d-flex align-items-center flex-column"
-            style={{ gap: ".5rem" }}
-          >
-            <div
-              className="d-flex align-items-center justify-content-center"
+              className="d-flex align-items-center flex-column"
               style={{ gap: ".5rem" }}
             >
-              <Button>-</Button>
-              <div>
-                <span className="fs-3">{quantity}</span>In Cart
+              <div
+                className="d-flex align-items-center justify-content-center"
+                style={{ gap: ".5rem" }}
+              >
+                <Button onClick={() => decreaseCartQuantity(id)}>-</Button>
+                <div>
+                  <span className="fs-3">{quantity}</span>In Cart
+                </div>
+                <Button onClick={() => increaseCartQuantity(id)}>+</Button>
               </div>
-              <Button>+</Button>
-              </div>
-             
-                <Button variant="danger" size="sm">
-                  Remove
-                </Button>
-              
+
+              <Button variant="danger" size="sm" onClick={() => removeFromCart(id)}>
+                Remove
+              </Button>
             </div>
           )}
         </div>

@@ -1,13 +1,19 @@
 import { useContext, createContext, ReactNode, useState } from "react";
+import ShoppingCart from "../components/ShoppingCart";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 interface ShoppingCartProviderProps {
   children: ReactNode;
 }
 
 interface ShoppingCardContex {
+  openCart: () => void;
+  closeCart: () => void;
+  cartItems: CartItem[];
   getItemQuantity: (id: number) => number;
   increaseCartQuantity: (id: number) => void;
   decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => void;
+  cartQuantity:number;
 }
 
 interface CartItem {
@@ -17,11 +23,22 @@ interface CartItem {
 const ShoppingCartContext = createContext({} as ShoppingCardContex);
 
 export function useShoppingCart() {
-    return useContext(ShoppingCartContext)
-  }
+  return useContext(ShoppingCartContext);
+}
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>("shopping-cart",[]);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const cartQuantity = cartItems.reduce(
+    (quantity, item) => item.quantity + quantity,
+    0
+  );
+
+  const openCart = () => setIsOpen(true);
+  const closeCart = () => setIsOpen(false);
+
+ 
 
   function getItemQuantity(id: number) {
     return cartItems.find((item) => item.id === id)?.quantity || 0;
@@ -64,8 +81,20 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   }
 
   return (
-    <ShoppingCartContext.Provider value={{getItemQuantity,increaseCartQuantity,decreaseCartQuantity,removeFromCart}}>
+    <ShoppingCartContext.Provider
+      value={{
+        getItemQuantity,
+        increaseCartQuantity,
+        decreaseCartQuantity,
+        removeFromCart,
+        cartItems,
+        openCart,
+        closeCart,
+        cartQuantity
+      }}
+    >
       {children}
+    <ShoppingCart isOpen={isOpen}/>
     </ShoppingCartContext.Provider>
   );
 }
